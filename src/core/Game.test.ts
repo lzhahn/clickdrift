@@ -1,129 +1,171 @@
 import { Game } from './Game';
-import { setupGameDOM, getButtonElement, getPointsPopup, simulateClick, wait } from '../test/utils';
-import { ButtonVariant, ButtonModifier } from '../types/game.types';
+import { GameState } from '../types/game.types';
+import '@testing-library/jest-dom';
 
 describe('Game', () => {
+  let game: Game;
+  let container: HTMLElement;
+  let pointsCounter: HTMLElement;
+  let upgradesContainer: HTMLElement;
+
   beforeEach(() => {
-    setupGameDOM();
+    // Set up DOM elements
+    container = document.createElement('div');
+    container.id = 'game-container';
+    
+    pointsCounter = document.createElement('span');
+    pointsCounter.id = 'points-counter';
+    
+    upgradesContainer = document.createElement('div');
+    upgradesContainer.id = 'upgrades';
+    
+    document.body.appendChild(container);
+    document.body.appendChild(pointsCounter);
+    document.body.appendChild(upgradesContainer);
+    
+    // Initialize game
+    game = new Game();
   });
 
-  describe('Initialization', () => {
-    it('should create initial button', () => {
-      const game = new Game();
-      const button = getButtonElement();
-      
-      expect(button).toBeTruthy();
-      expect(button.className).toBe('moving-button');
-      expect(button.textContent).toBe('Click!');
+  afterEach(() => {
+    document.body.innerHTML = '';
+    localStorage.clear();
+  });
+
+  describe('Game Initialization', () => {
+    it('should initialize with correct default state', () => {
+      expect(pointsCounter.textContent).toBe('0');
+      expect(container.querySelector('.moving-button')).toBeTruthy();
     });
 
-    it('should initialize with zero points', () => {
-      const game = new Game();
-      const counter = document.getElementById('points-counter');
+    it('should initialize upgrades menu', () => {
+      const upgradeItems = upgradesContainer.querySelectorAll('.upgrade-item');
+      expect(upgradeItems.length).toBe(2); // Click Power and Button Speed
       
-      expect(counter?.textContent).toBe('0');
-    });
-
-    it('should throw error if required DOM elements are missing', () => {
-      document.body.innerHTML = '';
+      const upgradeButtons = upgradesContainer.querySelectorAll('.upgrade-button');
+      expect(upgradeButtons.length).toBe(2);
       
-      expect(() => new Game()).toThrow('Required DOM elements not found');
+      // All upgrade buttons should be disabled initially (no points)
+      upgradeButtons.forEach(button => {
+        expect(button).toBeDisabled();
+      });
     });
   });
 
-  describe('Game Mechanics', () => {
-    let game: Game;
-    let button: HTMLButtonElement;
-    let initialPosition: { left: string; top: string };
-
-    beforeEach(() => {
-      game = new Game();
-      button = getButtonElement();
-      initialPosition = {
-        left: button.style.left,
-        top: button.style.top
-      };
+  describe('Button Clicks', () => {
+    it('should earn points on button click', () => {
+      const button = container.querySelector('.moving-button') as HTMLButtonElement;
+      button.click();
+      expect(pointsCounter.textContent).toBe('1');
     });
 
     it('should move button to new position on click', () => {
-      simulateClick(button);
+      const button = container.querySelector('.moving-button') as HTMLButtonElement;
+      const initialLeft = button.style.left;
+      const initialTop = button.style.top;
       
-      expect(button.style.left).not.toBe(initialPosition.left);
-      expect(button.style.top).not.toBe(initialPosition.top);
-    });
-
-    it('should increment points on button click', () => {
-      const counter = document.getElementById('points-counter')!;
-      simulateClick(button);
+      button.click();
       
-      expect(counter.textContent).toBe('1');
+      expect(button.style.left).not.toBe(initialLeft);
+      expect(button.style.top).not.toBe(initialTop);
     });
 
     it('should create points popup on click', () => {
-      simulateClick(button);
-      const popup = getPointsPopup();
+      const button = container.querySelector('.moving-button') as HTMLButtonElement;
+      button.click();
       
+      const popup = container.querySelector('.points-popup');
       expect(popup).toBeTruthy();
-      expect(popup.textContent).toBe('+1');
-    });
-
-    it('should remove points popup after animation', async () => {
-      simulateClick(button);
-      await wait(1100);
-      const popup = getPointsPopup();
-      
-      expect(popup).toBeFalsy();
+      expect(popup?.textContent).toBe('+1');
     });
   });
 
-  describe('Save/Load System', () => {
-    let game: Game;
-    
+  describe('Upgrades', () => {
     beforeEach(() => {
-      game = new Game();
+      // Click 10 times to get enough points for upgrades
+      const button = container.querySelector('.moving-button') as HTMLButtonElement;
+      for (let i = 0; i < 10; i++) {
+        button.click();
+      }
     });
 
-    it('should save game state to localStorage', () => {
-      const button = getButtonElement();
-      simulateClick(button);
-      
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        'clickDriftSave',
-        expect.any(String)
-      );
-      
-      const savedState = JSON.parse(
-        (localStorage.setItem as jest.Mock).mock.calls[0][1]
-      );
-      expect(savedState.points).toBe(1);
+    it('should enable upgrades when enough points are earned', () => {
+      const clickPowerButton = upgradesContainer.querySelector('[data-upgrade-id="click-power"]') as HTMLButtonElement;
+      expect(clickPowerButton).not.toBeDisabled();
     });
 
-    it('should load saved game state', () => {
-      const savedState = {
-        points: 42,
-        clickMultiplier: 2,
-        autoClickerRate: 1
-      };
+    it('should purchase click power upgrade correctly', () => {
+      const clickPowerButton = upgradesContainer.querySelector('[data-upgrade-id="click-power"]') as HTMLButtonElement;
+      clickPowerButton.click();
       
-      (localStorage.getItem as jest.Mock).mockReturnValue(
-        JSON.stringify(savedState)
-      );
+      // Check points were deducted
+      expect(pointsCounter.textContent).toBe('0');
       
-      game = new Game();
-      const counter = document.getElementById('points-counter');
+      // Click button and verify doubled points
+      const gameButton = container.querySelector('.moving-button') as HTMLButtonElement;
+      gameButton.click();
+      expect(pointsCounter.textContent).toBe('2');
+    });
+
+    it('should purchase button speed upgrade correctly', () => {
+      // Click 5 more times to afford button speed upgrade
+      const gameButton = container.querySelector('.moving-button') as HTMLButtonElement;
+      for (let i = 0; i < 5; i++) {
+        gameButton.click();
+      }
       
-      expect(counter?.textContent).toBe('42');
+      const buttonSpeedUpgrade = upgradesContainer.querySelector('[data-upgrade-id="button-speed"]') as HTMLButtonElement;
+      buttonSpeedUpgrade.click();
+      
+      // Verify the button has updated transition speed
+      gameButton.click();
+      const transitionTime = parseFloat(gameButton.style.transition.match(/[\d.]+s/)?.[0] || '0');
+      expect(transitionTime).toBeCloseTo(0.2, 2); // 0.3/1.5, allowing for floating point imprecision
+    });
+
+    it('should update upgrade display after purchase', () => {
+      const clickPowerButton = upgradesContainer.querySelector('[data-upgrade-id="click-power"]') as HTMLButtonElement;
+      clickPowerButton.click();
+      
+      const upgradeEffect = upgradesContainer.querySelector('.effect') as HTMLElement;
+      expect(upgradeEffect.textContent).toContain('2x');
+    });
+
+    it('should disable upgrades when points are insufficient', () => {
+      const clickPowerButton = upgradesContainer.querySelector('[data-upgrade-id="click-power"]') as HTMLButtonElement;
+      clickPowerButton.click(); // Spend all points
+      
+      const buttonSpeedUpgrade = upgradesContainer.querySelector('[data-upgrade-id="button-speed"]') as HTMLButtonElement;
+      expect(buttonSpeedUpgrade).toBeDisabled();
     });
   });
 
-  describe('Button Configuration', () => {
-    it('should create button with correct initial config', () => {
-      const game = new Game();
-      const button = getButtonElement();
+  describe('Save and Load', () => {
+    it('should save game state with upgrades', () => {
+      // Buy an upgrade
+      const button = container.querySelector('.moving-button') as HTMLButtonElement;
+      for (let i = 0; i < 10; i++) {
+        button.click();
+      }
       
-      expect(button.dataset.id).toBe('initial');
-      expect(button.style.left).toMatch(/\d+px/);
-      expect(button.style.top).toMatch(/\d+px/);
+      const clickPowerButton = upgradesContainer.querySelector('[data-upgrade-id="click-power"]') as HTMLButtonElement;
+      clickPowerButton.click();
+      
+      // Create new game instance
+      document.body.innerHTML = '';
+      document.body.appendChild(container);
+      document.body.appendChild(pointsCounter);
+      document.body.appendChild(upgradesContainer);
+      
+      const newGame = new Game();
+      
+      // Verify state was restored
+      expect(pointsCounter.textContent).toBe('0'); // Points were spent
+      
+      // Click button to verify multiplier was restored
+      const newButton = container.querySelector('.moving-button') as HTMLButtonElement;
+      newButton.click();
+      expect(pointsCounter.textContent).toBe('2'); // 2x multiplier
     });
   });
 });

@@ -7,6 +7,8 @@ export interface GameState {
   points: number;
   clickMultiplier: number;
   autoClickerRate: number;
+  upgrades: Record<string, Upgrade>;
+  buttonSpeed: number;
 }
 
 export interface Upgrade {
@@ -14,8 +16,18 @@ export interface Upgrade {
   name: string;
   description: string;
   cost: number;
+  level: number;
+  maxLevel: number;
+  baseEffect: number;
+  costMultiplier: number;
+  type: UpgradeType;
   purchased: boolean;
-  apply: (state: GameState) => GameState;
+}
+
+export enum UpgradeType {
+  ClickMultiplier = 'clickMultiplier',
+  ButtonSpeed = 'buttonSpeed',
+  AutoClicker = 'autoClicker'
 }
 
 export interface ButtonConfig {

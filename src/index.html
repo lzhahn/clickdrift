@@ -9,37 +9,108 @@
       margin: 0;
       padding: 20px;
       font-family: Arial, sans-serif;
-      background-color: #f0f2f5;
+      background: #1a1a1a;
+      color: #fff;
       overflow: hidden;
     }
 
     #game-container {
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
+      pointer-events: none;
     }
 
-    #hud {
+    #points-display {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      font-size: 24px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px 20px;
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    #upgrades {
       position: fixed;
       top: 20px;
       right: 20px;
-      background: rgba(255, 255, 255, 0.9);
+      width: 300px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+
+    .upgrade-item {
+      background: rgba(255, 255, 255, 0.1);
       padding: 15px;
+      margin-bottom: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .upgrade-item.can-purchase {
+      background: rgba(76, 175, 80, 0.2);
+    }
+
+    .upgrade-item h3 {
+      margin: 0 0 10px 0;
+      color: #4CAF50;
+    }
+
+    .upgrade-item p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .upgrade-item .effect {
+      color: #81C784;
+      font-weight: bold;
+    }
+
+    .upgrade-button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .upgrade-button:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+
+    .upgrade-button:hover:not(:disabled) {
+      background: #45a049;
     }
 
     .moving-button {
       position: absolute;
-      padding: 15px 30px;
-      background-color: #3498db;
-      color: white;
+      width: 60px;
+      height: 60px;
+      background: #4CAF50;
       border: none;
-      border-radius: 25px;
+      border-radius: 50%;
+      color: white;
       cursor: pointer;
-      transition: transform 0.3s ease;
-      user-select: none;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      transition: transform 0.1s ease;
+      z-index: 90;
+      pointer-events: auto;
     }
 
     .moving-button:hover {
@@ -48,32 +119,33 @@
 
     .points-popup {
       position: absolute;
-      color: #2ecc71;
+      color: #4CAF50;
       font-weight: bold;
       pointer-events: none;
-      animation: float-up 1s ease-out forwards;
+      animation: popup 1s ease-out forwards;
+      z-index: 110;
     }
 
-    @keyframes float-up {
+    @keyframes popup {
       0% {
+        transform: translateY(0) scale(1);
         opacity: 1;
-        transform: translateY(0);
       }
       100% {
+        transform: translateY(-50px) scale(1.5);
         opacity: 0;
-        transform: translateY(-50px);
       }
     }
   </style>
 </head>
 <body>
-  <div id="game-container">
-    <div id="hud">
-      <h2>Click Points: <span id="points-counter">0</span></h2>
-      <div id="upgrades"></div>
-    </div>
+  <div id="points-display">
+    Points: <span id="points-counter">0</span>
   </div>
-  <!-- Link to the compiled JavaScript file -->
-  <script src="../dist/index.js"></script>
+  <div id="upgrades">
+    <h2>Upgrades</h2>
+  </div>
+  <div id="game-container"></div>
+  <script src="index.js"></script>
 </body>
 </html>
