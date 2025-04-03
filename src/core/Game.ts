@@ -162,9 +162,13 @@ export class Game {
 
   private getRandomPosition(): Point {
     const padding = 100;
+    const upgradeWidth = 340; // 300px width + 20px padding on each side
+    const maxX = window.innerWidth - padding * 2 - upgradeWidth;
+    const maxY = window.innerHeight - padding * 2;
+    
     return {
-      x: Math.random() * (window.innerWidth - padding * 2) + padding,
-      y: Math.random() * (window.innerHeight - padding * 2) + padding
+      x: Math.random() * maxX + padding,
+      y: Math.random() * maxY + padding
     };
   }
 
