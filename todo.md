@@ -6,15 +6,15 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 
 ## 🧱 PHASE 1 – Core Game Loop (MVP)
 
-- [ ] Set up HTML/TS
-- [ ] Create a single moving button on screen
-  - [ ] Button moves to a random screen location after each click
-- [ ] Implement Click Point (CP) system
-  - [ ] +1 CP per manual click
-  - [ ] CP counter display
-- [ ] Add basic upgrade menu
-  - [ ] Upgrade: +1 CP per click
-  - [ ] Upgrade: Increase movement speed of the button
+- [x] Set up HTML/TS
+- [x] Create a single moving button on screen
+  - [x] Button moves to a random screen location after each click
+- [x] Implement Click Point (CP) system
+  - [x] +1 CP per manual click
+  - [x] CP counter display
+- [x] Add basic upgrade menu
+  - [x] Upgrade: +1 CP per click
+  - [x] Upgrade: Increase movement speed of the button
 - [ ] Add basic auto-clicker
   - [ ] Generates CP per second
   - [ ] Upgrade to increase speed/efficiency

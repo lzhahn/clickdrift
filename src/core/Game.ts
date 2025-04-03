@@ -184,8 +184,6 @@ export class Game {
     const savedState = localStorage.getItem('clickDriftSave');
     if (savedState) {
       const parsed = JSON.parse(savedState);
-      // Ensure upgrades are properly initialized with methods
-      parsed.upgrades = UpgradeManager.initializeUpgrades();
       this.state = { ...this.state, ...parsed };
       this.updateDisplay();
     }
