@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <style>
+    .movingButton {
+      transition: transform 0.5s ease;
+    }
+    #autoclickerButton {
+      top: 20px;
+      left: 20px;
+    }
+    .styledButton {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000; /* Ensures the button is above other content */
+    }
+    @keyframes colorCycle {
+      0% {
+        background-color: #3498db;
+      }
+      16% {
+        background-color: #e74c3c;
+      }
+      33% {
+        background-color: #f39c12;
+      }
+      50% {
+        background-color: #2ecc71;
+      }
+      66% {
+        background-color: #9b59b6;
+      }
+      83% {
+        background-color: #1abc9c;
+      }
+      100% {
+        background-color: #3498db;
+      }
+    }
+    .color-animation {
+      animation: colorCycle 1s ease-in-out forwards;
+    }
+    .trail {
+      position: absolute;
+      pointer-events: none; /* Prevent the trail from being interactive */
+      opacity: 1;
+      transition: opacity 1s ease-out; /* Fade out the trail */
+    }
+  </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple HTML with TypeScript</title>
+  </head>
+  <body>
+    <button id="movingButton" , class="styledButton">Click me</button>
+    <button id="autoclickerButton" , class="styledButton">Autoclicker</button>
+
+    <!-- Link to the compiled JavaScript file -->
+    <script src="../dist/index.js"></script>
+  </body>
+</html>
