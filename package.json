@@ -1,18 +1,37 @@
 {
-  "name": "basicsite",
+  "name": "click-drift",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "publish": "tsc",
-    "start": "node dist/index.js"
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "A chaotic incremental clicker game",
   "dependencies": {
     "typescript": "^5.5.4"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2"
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "css-loader": "^6.10.0",
+    "eslint": "^8.56.0",
+    "html-webpack-plugin": "^5.6.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "style-loader": "^3.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
   }
 }

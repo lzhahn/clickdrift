@@ -6,7 +6,7 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 
 ## 🧱 PHASE 1 – Core Game Loop (MVP)
 
-- [ ] Set up HTML/JS
+- [ ] Set up HTML/TS
 - [ ] Create a single moving button on screen
   - [ ] Button moves to a random screen location after each click
 - [ ] Implement Click Point (CP) system
@@ -101,39 +101,3 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
   - [ ] Stats/feedback bar
 
 ---
-
-## 📲 PHASE 8 – Responsive Layout & Mobile Support
-
-- [ ] Make layout responsive (Flex/Grid or Canvas scaling)
-- [ ] Touch input support for tapping buttons
-- [ ] Adjust movement speed and button size for mobile UX
-
----
-
-## 📦 Optional Extras (Stretch Goals)
-
-- [ ] Daily challenge mode
-- [ ] Leaderboard integration
-- [ ] Import/export save files
-- [ ] In-game screenshot or shareable click stats
-
----
-
-## 🧪 Testing & QA
-
-- [ ] Unit test CP gain logic
-- [ ] Test save/load edge cases
-- [ ] Performance test with 20+ buttons on screen
-- [ ] Ensure all events and upgrades function as expected
-
----
-
-## 🚀 Release Checklist
-
-- [ ] Bundle and minify assets
-- [ ] Ensure save system is stable
-- [ ] Add favicon and title metadata
-- [ ] Deploy to web host (GitHub Pages, Netlify, etc.)
-
----
-

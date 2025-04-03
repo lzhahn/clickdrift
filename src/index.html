@@ -1,65 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click Drift</title>
   <style>
-    .movingButton {
-      transition: transform 0.5s ease;
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      overflow: hidden;
     }
-    #autoclickerButton {
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #hud {
+      position: fixed;
       top: 20px;
-      left: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-    .styledButton {
-      padding: 10px 20px;
+
+    .moving-button {
+      position: absolute;
+      padding: 15px 30px;
       background-color: #3498db;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 25px;
       cursor: pointer;
-      z-index: 1000; /* Ensures the button is above other content */
+      transition: transform 0.3s ease;
+      user-select: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    @keyframes colorCycle {
+
+    .moving-button:hover {
+      transform: scale(1.1);
+    }
+
+    .points-popup {
+      position: absolute;
+      color: #2ecc71;
+      font-weight: bold;
+      pointer-events: none;
+      animation: float-up 1s ease-out forwards;
+    }
+
+    @keyframes float-up {
       0% {
-        background-color: #3498db;
-      }
-      16% {
-        background-color: #e74c3c;
-      }
-      33% {
-        background-color: #f39c12;
-      }
-      50% {
-        background-color: #2ecc71;
-      }
-      66% {
-        background-color: #9b59b6;
-      }
-      83% {
-        background-color: #1abc9c;
+        opacity: 1;
+        transform: translateY(0);
       }
       100% {
-        background-color: #3498db;
+        opacity: 0;
+        transform: translateY(-50px);
       }
     }
-    .color-animation {
-      animation: colorCycle 1s ease-in-out forwards;
-    }
-    .trail {
-      position: absolute;
-      pointer-events: none; /* Prevent the trail from being interactive */
-      opacity: 1;
-      transition: opacity 1s ease-out; /* Fade out the trail */
-    }
   </style>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple HTML with TypeScript</title>
-  </head>
-  <body>
-    <button id="movingButton" , class="styledButton">Click me</button>
-    <button id="autoclickerButton" , class="styledButton">Autoclicker</button>
-
-    <!-- Link to the compiled JavaScript file -->
-    <script src="../dist/index.js"></script>
-  </body>
+</head>
+<body>
+  <div id="game-container">
+    <div id="hud">
+      <h2>Click Points: <span id="points-counter">0</span></h2>
+      <div id="upgrades"></div>
+    </div>
+  </div>
+  <!-- Link to the compiled JavaScript file -->
+  <script src="../dist/index.js"></script>
+</body>
 </html>

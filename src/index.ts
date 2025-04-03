@@ -1,3 +1,9 @@
+import { Game } from './core/Game';
+
+document.addEventListener('DOMContentLoaded', () => {
+  new Game();
+});
+
 const button = document.getElementById("movingButton")!;
 let isMoving = false;
 let transitionDuration = 1; // Start with 1 second transition
