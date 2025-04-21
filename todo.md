@@ -40,10 +40,10 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 
 ## 🏗 PHASE 3 – Multi-Button System (Button Factory)
 
-- [ ] Unlock and render multiple buttons on screen
-- [ ] Allow slot-based spawning of new buttons
-- [ ] Player can configure button slot (type/modifiers)
-- [ ] Add simple UI to manage active buttons
+- [x] Unlock and render multiple buttons on screen
+- [x] Allow slot-based spawning of new buttons
+- [x] Player can configure button slot (type/modifiers)
+- [x] Add simple UI to manage active buttons
 
 ---
 
