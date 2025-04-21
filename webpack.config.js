@@ -14,6 +14,13 @@ module.exports = {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: '[name][ext]'
+        }
+      },
     ],
   },
   resolve: {
@@ -27,6 +34,25 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
+    // Copy images from src/public to dist
+    {
+      apply: (compiler) => {
+        compiler.hooks.emit.tapAsync('CopyPublicImages', (compilation, callback) => {
+          const fs = require('fs');
+          const path = require('path');
+          const srcDir = path.resolve(__dirname, 'src/public');
+          const distDir = path.resolve(__dirname, 'dist');
+          if (fs.existsSync(srcDir)) {
+            fs.readdirSync(srcDir).forEach(file => {
+              if (/\.(png|jpe?g|gif|svg)$/i.test(file)) {
+                fs.copyFileSync(path.join(srcDir, file), path.join(distDir, file));
+              }
+            });
+          }
+          callback();
+        });
+      }
+    }
   ],
   devServer: {
     static: {

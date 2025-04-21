@@ -7,6 +7,9 @@ export class Game {
   private container: HTMLElement;
   private pointsCounter: HTMLElement;
   private upgradesContainer: HTMLElement;
+  private autoClickerMouseEl: HTMLDivElement | null = null;
+  private autoClickerActive = false;
+  private autoClickerInterval: number | null = null;
 
   constructor() {
     this.state = {
@@ -37,6 +40,7 @@ export class Game {
     this.createInitialButton();
     this.setupAutoSave();
     this.renderUpgrades();
+    this.checkAutoClickerActivation();
   }
 
   private createInitialButton(): void {
@@ -144,6 +148,7 @@ export class Game {
     this.updateDisplay();
     this.renderUpgrades();
     this.saveGame();
+    this.checkAutoClickerActivation();
   }
 
   private addPoints(amount: number): void {
@@ -199,6 +204,96 @@ export class Game {
       const parsed = JSON.parse(savedState);
       this.state = { ...this.state, ...parsed };
       this.updateDisplay();
+    }
+  }
+
+  private createAutoClickerMouse(): void {
+    if (this.autoClickerMouseEl) return;
+    const mouse = document.createElement('div');
+    mouse.className = 'auto-clicker-mouse';
+    mouse.style.position = 'absolute';
+    mouse.style.width = '32px';
+    mouse.style.height = '48px';
+    mouse.style.zIndex = '120';
+    mouse.style.pointerEvents = 'none';
+    mouse.style.background = 'none';
+    mouse.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = '/mouse.png';
+    img.alt = 'Auto Clicker Mouse';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.display = 'block';
+    mouse.appendChild(img);
+    this.autoClickerMouseEl = mouse;
+    this.container.appendChild(mouse);
+  }
+
+  private moveAutoClickerMouseToButton(buttonId: string): void {
+    if (!this.autoClickerMouseEl) return;
+    const button = this.container.querySelector(`button[data-id="${buttonId}"]`) as HTMLButtonElement;
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    // Center mouse pointer at center of button
+    const mouseX = rect.left + rect.width / 2 - 16; // 16 = half mouse width
+    const mouseY = rect.top + rect.height / 2 - 24; // 24 = half mouse height
+    this.autoClickerMouseEl.style.left = `${mouseX}px`;
+    this.autoClickerMouseEl.style.top = `${mouseY}px`;
+    this.autoClickerMouseEl.style.transition = 'left 0.5s cubic-bezier(0.22, 1, 0.36, 1), top 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+  }
+
+  private startAutoClicker(): void {
+    if (this.autoClickerActive) return;
+    this.autoClickerActive = true;
+    this.createAutoClickerMouse();
+    const buttonId = 'initial';
+    let lastTarget = { x: 0, y: 0 };
+    const getButtonCenter = () => {
+      const button = this.container.querySelector(`button[data-id="${buttonId}"]`) as HTMLButtonElement;
+      if (!button) return null;
+      const rect = button.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    };
+    const getMousePos = () => {
+      if (!this.autoClickerMouseEl) return null;
+      const rect = this.autoClickerMouseEl.getBoundingClientRect();
+      return { x: rect.left + 16, y: rect.top + 24 };
+    };
+    this.moveAutoClickerMouseToButton(buttonId);
+    this.autoClickerInterval = window.setInterval(() => {
+      // Move mouse
+      this.moveAutoClickerMouseToButton(buttonId);
+      lastTarget = getButtonCenter() || lastTarget;
+      // Wait for mouse to be close enough before clicking
+      setTimeout(() => {
+        if (!this.autoClickerActive) return;
+        const mousePos = getMousePos();
+        const dist = mousePos && lastTarget ? Math.hypot(mousePos.x - lastTarget.x, mousePos.y - lastTarget.y) : 9999;
+        if (dist < 8) { // 8px threshold
+          const button = this.container.querySelector(`button[data-id="${buttonId}"]`) as HTMLButtonElement;
+          if (button) button.click();
+        }
+      }, 500); // Wait for transition duration
+    }, 1000 / Math.max(1, this.state.autoClickerRate || 1));
+  }
+
+  private stopAutoClicker(): void {
+    this.autoClickerActive = false;
+    if (this.autoClickerInterval) {
+      clearInterval(this.autoClickerInterval);
+      this.autoClickerInterval = null;
+    }
+    if (this.autoClickerMouseEl) {
+      this.autoClickerMouseEl.remove();
+      this.autoClickerMouseEl = null;
+    }
+  }
+
+  private checkAutoClickerActivation(): void {
+    if (this.state.autoClickerRate > 0) {
+      this.startAutoClicker();
+    } else {
+      this.stopAutoClicker();
     }
   }
 }

@@ -38,6 +38,14 @@
       will-change: opacity, transform, filter;
       z-index: 110;
     }
+    .auto-clicker-mouse {
+      pointer-events: none;
+      z-index: 120;
+      transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1), top 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      filter: drop-shadow(0 2px 8px #0004);
+      opacity: 0.97;
+      will-change: left, top;
+    }
   </style>
 </head>
 <body style="overflow: hidden; background: #008080;">

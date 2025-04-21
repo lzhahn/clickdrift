@@ -15,9 +15,9 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 - [x] Add basic upgrade menu
   - [x] Upgrade: +1 CP per click
   - [x] Upgrade: Increase movement speed of the button
-- [ ] Add basic auto-clicker
-  - [ ] Generates CP per second
-  - [ ] Upgrade to increase speed/efficiency
+- [x] Add basic auto-clicker
+  - [x] Generates CP per second
+  - [x] Upgrade to increase speed/efficiency
 - [x] Save/load system using localStorage
 
 ---

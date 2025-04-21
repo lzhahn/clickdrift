@@ -25,6 +25,18 @@ export class UpgradeManager {
       costMultiplier: 2.5,
       type: UpgradeType.ButtonSpeed,
       purchased: false
+    },
+    {
+      id: 'auto-clicker',
+      name: 'Auto-Clicker',
+      description: 'Activate a Windows mouse that clicks for you',
+      cost: 50,
+      level: 0,
+      maxLevel: 10,
+      baseEffect: 1,
+      costMultiplier: 2.5,
+      type: UpgradeType.AutoClicker,
+      purchased: false
     }
   ];
 
