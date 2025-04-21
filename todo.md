@@ -18,7 +18,7 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 - [ ] Add basic auto-clicker
   - [ ] Generates CP per second
   - [ ] Upgrade to increase speed/efficiency
-- [ ] Save/load system using localStorage
+- [x] Save/load system using localStorage
 
 ---
 

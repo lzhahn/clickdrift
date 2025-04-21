@@ -56,8 +56,13 @@ export class Game {
     button.className = 'moving-button';
     button.textContent = 'Click!';
     button.dataset.id = id;
+    button.style.position = 'absolute';
+    button.style.width = `${config.size}px`;
+    button.style.height = `${config.size}px`;
     button.style.left = `${config.position.x}px`;
     button.style.top = `${config.position.y}px`;
+    button.style.zIndex = '90';
+    button.style.pointerEvents = 'auto';
     
     button.addEventListener('click', () => this.handleButtonClick(id));
     
@@ -151,8 +156,12 @@ export class Game {
     const popup = document.createElement('div');
     popup.className = 'points-popup';
     popup.textContent = `+${points}`;
+    popup.style.position = 'absolute';
     popup.style.left = `${position.x}px`;
     popup.style.top = `${position.y}px`;
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.pointerEvents = 'none';
+    popup.style.zIndex = '110';
     
     this.container.appendChild(popup);
     

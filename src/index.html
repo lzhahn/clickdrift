@@ -4,148 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Click Drift</title>
+  <link rel="stylesheet" href="https://unpkg.com/xp.css">
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #1a1a1a;
-      color: #fff;
-      overflow: hidden;
-    }
-
-    #game-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-    }
-
-    #points-display {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 100;
-      font-size: 24px;
-      font-weight: bold;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 10px 20px;
-      border-radius: 10px;
-      pointer-events: none;
-    }
-
-    #upgrades {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 300px;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      border-radius: 10px;
-      max-height: calc(100vh - 40px);
-      overflow-y: auto;
-      pointer-events: auto;
-    }
-
-    .upgrade-item {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-
-    .upgrade-item.can-purchase {
-      background: rgba(76, 175, 80, 0.2);
-    }
-
-    .upgrade-item h3 {
-      margin: 0 0 10px 0;
-      color: #4CAF50;
-    }
-
-    .upgrade-item p {
-      margin: 5px 0;
-      font-size: 14px;
-    }
-
-    .upgrade-item .effect {
-      color: #81C784;
-      font-weight: bold;
-    }
-
-    .upgrade-button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 10px;
-      background: #4CAF50;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .upgrade-button:disabled {
-      background: #666;
-      cursor: not-allowed;
-    }
-
-    .upgrade-button:hover:not(:disabled) {
-      background: #45a049;
-    }
-
-    .moving-button {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background: #4CAF50;
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.1s ease;
-      z-index: 90;
-      pointer-events: auto;
-    }
-
-    .moving-button:hover {
-      transform: scale(1.1);
-    }
-
-    .points-popup {
-      position: absolute;
-      color: #4CAF50;
-      font-weight: bold;
-      pointer-events: none;
-      animation: popup 1s ease-out forwards;
-      z-index: 110;
-    }
-
-    @keyframes popup {
+    @keyframes pointsPopup {
       0% {
-        transform: translateY(0) scale(1);
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+        filter: blur(2px);
+      }
+      10% {
         opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+        filter: blur(0);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -70%) scale(1.1) rotate(-3deg);
+        filter: blur(0);
       }
       100% {
-        transform: translateY(-50px) scale(1.5);
         opacity: 0;
+        transform: translate(-50%, -110%) scale(1.3) rotate(8deg);
+        filter: blur(2px);
       }
+    }
+    .points-popup {
+      animation: pointsPopup 1s cubic-bezier(0.23, 1.02, 0.38, 0.99) forwards;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #ffcc00;
+      text-shadow: 1px 1px 4px #333, 0 0 10px #fff8;
+      pointer-events: none;
+      will-change: opacity, transform, filter;
+      z-index: 110;
     }
   </style>
 </head>
-<body>
-  <div id="points-display">
-    Points: <span id="points-counter">0</span>
+<body style="overflow: hidden; background: #008080;">
+  <div class="window" style="position: fixed; top: 20px; left: 20px; min-width: 200px; z-index: 100; pointer-events: none;">
+    <div class="title-bar">
+      <div class="title-bar-text">Points</div>
+    </div>
+    <div class="window-body" id="points-display" style="font-size: 24px; font-weight: bold; pointer-events: none; background: transparent;">
+      Points: <span id="points-counter">0</span>
+    </div>
   </div>
-  <div id="upgrades">
-    <h2>Upgrades</h2>
+
+  <div class="window" style="position: fixed; top: 20px; right: 20px; width: 320px; z-index: 100; max-height: calc(100vh - 40px); overflow-y: auto; pointer-events: auto;">
+    <div class="title-bar">
+      <div class="title-bar-text">Upgrades</div>
+    </div>
+    <div class="window-body" id="upgrades">
+      <h2>Upgrades</h2>
+    </div>
   </div>
-  <div id="game-container"></div>
+
+  <div id="game-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;"></div>
+
   <script src="index.js"></script>
 </body>
 </html>
