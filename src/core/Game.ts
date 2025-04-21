@@ -357,7 +357,13 @@ export class Game {
   }
 
   private saveGame(): void {
-    localStorage.setItem('clickDriftSave', JSON.stringify(this.state));
+    // Always persist multiButtonCount and upgrades, even if undefined in state
+    const stateToSave = {
+      ...this.state,
+      multiButtonCount: this.state.multiButtonCount || 1,
+      upgrades: this.state.upgrades
+    };
+    localStorage.setItem('clickDriftSave', JSON.stringify(stateToSave));
   }
 
   private loadGame(): void {
@@ -497,27 +503,37 @@ export class Game {
     // Remove old UI if present
     let container = document.getElementById('button-slot-config');
     if (container) container.remove();
+    // 7.css window
     container = document.createElement('div');
     container.id = 'button-slot-config';
+    container.className = 'window';
     container.style.position = 'fixed';
     container.style.bottom = '80px';
     container.style.left = '24px';
-    container.style.background = '#fff';
-    container.style.border = '1px solid #888';
-    container.style.padding = '12px';
+    container.style.minWidth = '260px';
     container.style.zIndex = '301';
-    container.style.boxShadow = '0 2px 12px #0002';
-    container.innerHTML = `<b>Configure Button Modifiers</b><br/>`;
+    container.style.pointerEvents = 'auto';
+    // Title bar
+    const titleBar = document.createElement('div');
+    titleBar.className = 'title-bar';
+    const titleText = document.createElement('div');
+    titleText.className = 'title-bar-text';
+    titleText.textContent = 'Configure Button Modifiers';
+    titleBar.appendChild(titleText);
+    container.appendChild(titleBar);
+    // Window body
+    const body = document.createElement('div');
+    body.className = 'window-body';
+    body.style.padding = '12px';
     const count = this.state.multiButtonCount || 1;
     for (let i = 0; i < count; i++) {
       const slotConfig = this.state.buttonSlots?.[i] || { variant: ButtonVariant.Normal, modifiers: [] };
       const slotDiv = document.createElement('div');
-      slotDiv.style.marginBottom = '8px';
+      slotDiv.style.marginBottom = '12px';
       slotDiv.innerHTML = `<b>Button #${i + 1}</b> `;
-      // Only show modifier dropdown for buttons after the first
       if (i > 0) {
-        // Modifiers single-select dropdown
         const modSelect = document.createElement('select');
+        modSelect.className = 'form-control';
         modSelect.multiple = false;
         for (const m of Object.values(ButtonModifier)) {
           const opt = document.createElement('option');
@@ -535,11 +551,11 @@ export class Game {
         });
         slotDiv.appendChild(modSelect);
       } else {
-        // For Button 1, show a label instead
         slotDiv.appendChild(document.createTextNode('(No modifiers)'));
       }
-      container.appendChild(slotDiv);
+      body.appendChild(slotDiv);
     }
+    container.appendChild(body);
     document.body.appendChild(container);
   }
 

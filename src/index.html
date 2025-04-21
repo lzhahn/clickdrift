@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Click Drift</title>
-  <link rel="stylesheet" href="https://unpkg.com/7.css">
+  <link id="theme-css" rel="stylesheet" href="https://unpkg.com/7.css">
   <style>
     @keyframes pointsPopup {
       0% {
@@ -108,12 +108,36 @@
     </div>
   </div>
 
-  <div id="delete-save-container" style="position:fixed;bottom:20px;left:24px;z-index:300;">
+  <div id="delete-save-container" style="position:fixed;bottom:20px;left:24px;z-index:300;display:flex;flex-direction:row;gap:8px;">
     <button id="delete-save-btn" class="btn btn-danger" style="font-weight:bold;min-width:120px;">🗑 Delete Save</button>
+    <select id="theme-switch-select" class="form-control" style="min-width:140px;">
+      <option value="7.css">7.css</option>
+      <option value="xp.css@latest">XP.css</option>
+      <option value="98.css@latest">98.css</option>
+    </select>
   </div>
 
   <div id="game-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;"></div>
 
+  <script>
+    // Theme switcher logic
+    window.addEventListener('DOMContentLoaded', function() {
+      const themeSelect = document.getElementById('theme-switch-select');
+      if (!themeSelect) return;
+      themeSelect.addEventListener('change', function(e) {
+        const link = document.getElementById('theme-css');
+        if (!link) return;
+        const theme = themeSelect.value;
+        if (theme === '7.css') {
+          link.setAttribute('href', 'https://unpkg.com/7.css');
+        } else if (theme === 'xp.css@latest') {
+          link.setAttribute('href', 'https://unpkg.com/xp.css@latest');
+        } else if (theme === '98.css@latest') {
+          link.setAttribute('href', 'https://unpkg.com/98.css@latest');
+        }
+      });
+    });
+  </script>
   <script src="index.js"></script>
 </body>
 </html>
