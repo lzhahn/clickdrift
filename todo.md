@@ -26,7 +26,6 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 
 - [ ] Create button variant system
   - [ ] Golden Button (5x CP, rare)
-  - [ ] Exploding Button (CP burst on timer click)
   - [ ] Frozen Button (static for bonus CP)
 - [ ] Add random spawn system for variants
 - [ ] Implement button modifiers system

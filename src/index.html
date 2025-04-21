@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Click Drift</title>
-  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <link rel="stylesheet" href="https://unpkg.com/7.css">
   <style>
     @keyframes pointsPopup {
       0% {
@@ -46,6 +46,47 @@
       opacity: 0.97;
       will-change: left, top;
     }
+    .explosion-effect {
+      pointer-events: none;
+      border-radius: 50%;
+      opacity: 0.85;
+      animation: explodeAnim 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .explosion-golden {
+      background: radial-gradient(circle at 60% 40%, #fff9b0 60%, #ffd700 100%);
+      box-shadow: 0 0 24px 8px #ffd70088, 0 0 64px 16px #fff9b066;
+    }
+    .explosion-exploding {
+      background: radial-gradient(circle at 50% 50%, #fff 40%, #ff5a36 100%);
+      box-shadow: 0 0 32px 12px #ff5a3688, 0 0 80px 24px #fff4;
+    }
+    .explosion-frozen {
+      background: radial-gradient(circle at 60% 40%, #e0f7ff 60%, #83eaff 100%);
+      box-shadow: 0 0 24px 8px #83eaff88, 0 0 64px 16px #e0f7ff66;
+    }
+    @keyframes explodeAnim {
+      0% { transform: scale(0.5); opacity: 1; }
+      80% { opacity: 0.95; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .modifier-bouncy {
+      border: 2px solid #ff9800;
+      box-shadow: 0 0 10px 2px #ff980088;
+    }
+    .modifier-hyperactive {
+      border: 2px dashed #03a9f4;
+      box-shadow: 0 0 12px 3px #03a9f488;
+    }
+    .modifier-shrinking {
+      border: 2px solid #607d8b;
+      opacity: 0.8;
+    }
+    @keyframes bouncyMove {
+      0%, 100% { transform: translateY(0); }
+      20% { transform: translateY(-8px); }
+      50% { transform: translateY(6px); }
+      80% { transform: translateY(-4px); }
+    }
   </style>
 </head>
 <body style="overflow: hidden; background: #008080;">
@@ -65,6 +106,10 @@
     <div class="window-body" id="upgrades">
       <h2>Upgrades</h2>
     </div>
+  </div>
+
+  <div id="delete-save-container" style="position:fixed;bottom:20px;left:24px;z-index:300;">
+    <button id="delete-save-btn" class="btn btn-danger" style="font-weight:bold;min-width:120px;">🗑 Delete Save</button>
   </div>
 
   <div id="game-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;"></div>

@@ -41,7 +41,6 @@ export interface ButtonConfig {
 export enum ButtonVariant {
   Normal = 'normal',
   Golden = 'golden',
-  Exploding = 'exploding',
   Frozen = 'frozen'
 }
 
@@ -49,5 +48,6 @@ export enum ButtonModifier {
   None = 'none',
   Bouncy = 'bouncy',
   Hyperactive = 'hyperactive',
-  Shrinking = 'shrinking'
+  Shrinking = 'shrinking',
+  ZigZag = 'zigzag'
 }
