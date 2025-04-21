@@ -19,7 +19,8 @@ export class Game {
       autoClickerRate: 0,
       buttonSpeed: 1,
       upgrades: UpgradeManager.initializeUpgrades(),
-      multiButtonCount: 1
+      multiButtonCount: 1,
+      buttonSlots: []
     };
     this.buttons = new Map();
     
@@ -44,6 +45,7 @@ export class Game {
     this.renderUpgrades();
     this.checkAutoClickerActivation();
     this.setupDeleteSaveButton();
+    this.setupButtonSlotConfigUI();
   }
 
   private renderButtons(): void {
@@ -54,12 +56,13 @@ export class Game {
     // Determine how many buttons to render
     const count = this.state.multiButtonCount || 1;
     for (let i = 0; i < count; i++) {
+      const slotConfig = this.state.buttonSlots?.[i];
       const buttonConfig: ButtonConfig = {
         position: this.getRandomPosition(),
         size: 60,
         speed: this.state.buttonSpeed,
-        variant: ButtonVariant.Normal,
-        modifiers: []
+        variant: slotConfig?.variant ?? ButtonVariant.Normal,
+        modifiers: slotConfig?.modifiers ?? (i === 0 ? [ButtonModifier.None] : [])
       };
       this.createButton(`multi-${i}-${Date.now()}`, buttonConfig);
     }
@@ -258,29 +261,27 @@ export class Game {
 
   private renderUpgrades(): void {
     this.upgradesContainer.innerHTML = '<h2>Upgrades</h2>';
-    
     Object.values(this.state.upgrades).forEach(upgrade => {
+      // Hide upgrades that are maxed out
+      if (upgrade.level >= upgrade.maxLevel) return;
+      // Hide 'Modifier Config' upgrade until more than one button is unlocked
+      if (upgrade.id === 'button-modifier-config' && (this.state.multiButtonCount || 1) <= 1) return;
       const upgradeElement = document.createElement('div');
       upgradeElement.className = 'upgrade-item';
-      
       const canPurchase = UpgradeManager.canPurchaseUpgrade(this.state, upgrade.id);
       upgradeElement.classList.toggle('can-purchase', canPurchase);
-      
       upgradeElement.innerHTML = `
         <h3>${upgrade.name} (Level ${upgrade.level}/${upgrade.maxLevel})</h3>
         <p>${upgrade.description}</p>
         <p class="effect">${UpgradeManager.getUpgradeEffect(upgrade)}</p>
-        <button class="upgrade-button" data-upgrade-id="${upgrade.id}" 
-                ${!canPurchase ? 'disabled' : ''}>
+        <button class="upgrade-button" data-upgrade-id="${upgrade.id}" ${!canPurchase ? 'disabled' : ''}>
           Buy (${upgrade.cost} CP)
         </button>
       `;
-      
       const button = upgradeElement.querySelector('button');
       if (button) {
         button.addEventListener('click', () => this.purchaseUpgrade(upgrade.id));
       }
-      
       this.upgradesContainer.appendChild(upgradeElement);
     });
   }
@@ -302,6 +303,11 @@ export class Game {
     this.renderUpgrades();
     if (upgradeId === 'multi-button') {
       this.renderButtons();
+    }
+    // If modifier config upgrade was just purchased, show the config UI
+    if (upgradeId === 'button-modifier-config') {
+      this.setupButtonSlotConfigUI();
+      this.renderButtonSlotConfigUI();
     }
     this.saveGame();
     this.checkAutoClickerActivation();
@@ -477,13 +483,98 @@ export class Game {
       autoClickerRate: 0,
       buttonSpeed: 1,
       upgrades: UpgradeManager.initializeUpgrades(),
-      multiButtonCount: 1
+      multiButtonCount: 1,
+      buttonSlots: []
     };
     this.updateDisplay();
     this.renderUpgrades();
     this.renderButtons();
     this.checkAutoClickerActivation();
     this.saveGame();
+  }
+
+  private renderButtonSlotConfigUI(): void {
+    // Remove old UI if present
+    let container = document.getElementById('button-slot-config');
+    if (container) container.remove();
+    container = document.createElement('div');
+    container.id = 'button-slot-config';
+    container.style.position = 'fixed';
+    container.style.bottom = '80px';
+    container.style.left = '24px';
+    container.style.background = '#fff';
+    container.style.border = '1px solid #888';
+    container.style.padding = '12px';
+    container.style.zIndex = '301';
+    container.style.boxShadow = '0 2px 12px #0002';
+    container.innerHTML = `<b>Configure Button Modifiers</b><br/>`;
+    const count = this.state.multiButtonCount || 1;
+    for (let i = 0; i < count; i++) {
+      const slotConfig = this.state.buttonSlots?.[i] || { variant: ButtonVariant.Normal, modifiers: [] };
+      const slotDiv = document.createElement('div');
+      slotDiv.style.marginBottom = '8px';
+      slotDiv.innerHTML = `<b>Button #${i + 1}</b> `;
+      // Only show modifier dropdown for buttons after the first
+      if (i > 0) {
+        // Modifiers single-select dropdown
+        const modSelect = document.createElement('select');
+        modSelect.multiple = false;
+        for (const m of Object.values(ButtonModifier)) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+          if (slotConfig.modifiers?.length === 1 && slotConfig.modifiers[0] === m) opt.selected = true;
+          modSelect.appendChild(opt);
+        }
+        modSelect.addEventListener('change', (e) => {
+          const selected = (e.target as HTMLSelectElement).value as ButtonModifier;
+          this.setButtonSlotConfig(i, {
+            ...slotConfig,
+            modifiers: [selected]
+          });
+        });
+        slotDiv.appendChild(modSelect);
+      } else {
+        // For Button 1, show a label instead
+        slotDiv.appendChild(document.createTextNode('(No modifiers)'));
+      }
+      container.appendChild(slotDiv);
+    }
+    document.body.appendChild(container);
+  }
+
+  private setButtonSlotConfig(slot: number, config: {variant: ButtonVariant, modifiers: ButtonModifier[]}): void {
+    if (!this.state.buttonSlots) this.state.buttonSlots = [];
+    this.state.buttonSlots[slot] = config;
+    this.saveGame();
+    this.renderButtons();
+    this.renderButtonSlotConfigUI();
+  }
+
+  private setupButtonSlotConfigUI(): void {
+    // Only show the button if the upgrade is unlocked
+    const modConfigUpgrade = this.state.upgrades['button-modifier-config'];
+    if (!modConfigUpgrade || modConfigUpgrade.level < 1) return;
+    let btn = document.getElementById('configure-buttons-btn') as HTMLButtonElement | null;
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'configure-buttons-btn';
+      btn.textContent = 'Configure Buttons';
+      btn.className = 'btn btn-default';
+      btn.style.position = 'fixed';
+      btn.style.bottom = '48px';
+      btn.style.left = '24px';
+      btn.style.zIndex = '302';
+      btn.addEventListener('click', () => {
+        const menu = document.getElementById('button-slot-config');
+        if (menu) {
+          menu.remove();
+        } else {
+          this.renderButtonSlotConfigUI();
+        }
+      });
+      document.body.appendChild(btn);
+    }
   }
 
   /**

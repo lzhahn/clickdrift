@@ -10,6 +10,7 @@ export interface GameState {
   upgrades: Record<string, Upgrade>;
   buttonSpeed: number;
   multiButtonCount?: number;
+  buttonSlots: ButtonSlotConfig[];
 }
 
 export interface Upgrade {
@@ -29,7 +30,8 @@ export enum UpgradeType {
   ClickMultiplier = 'clickMultiplier',
   ButtonSpeed = 'buttonSpeed',
   AutoClicker = 'autoClicker',
-  MultiButton = 'multiButton'
+  MultiButton = 'multiButton',
+  ButtonModifierConfig = 'buttonModifierConfig'
 }
 
 export interface ButtonConfig {
@@ -52,4 +54,9 @@ export enum ButtonModifier {
   Hyperactive = 'hyperactive',
   Shrinking = 'shrinking',
   ZigZag = 'zigzag'
+}
+
+export interface ButtonSlotConfig {
+  variant: ButtonVariant;
+  modifiers: ButtonModifier[];
 }

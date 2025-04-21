@@ -49,6 +49,18 @@ export class UpgradeManager {
       costMultiplier: 3,
       type: UpgradeType.MultiButton,
       purchased: false
+    },
+    {
+      id: 'button-modifier-config',
+      name: 'Modifier Config',
+      description: 'Unlocks the ability to configure modifiers for your buttons',
+      cost: 100,
+      level: 0,
+      maxLevel: 1,
+      baseEffect: 1,
+      costMultiplier: 1,
+      type: UpgradeType.ButtonModifierConfig,
+      purchased: false
     }
   ];
 
