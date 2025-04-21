@@ -9,7 +9,7 @@ export class Game {
   private upgradesContainer: HTMLElement;
   private autoClickerMouseEl: HTMLDivElement | null = null;
   private autoClickerActive = false;
-  private autoClickerInterval: number | null = null;
+  private autoClickerInterval: ReturnType<typeof setInterval> | null = null;
   private bouncingButtons: Map<string, {vx: number; vy: number}> = new Map();
 
   constructor() {
@@ -18,7 +18,8 @@ export class Game {
       clickMultiplier: 1,
       autoClickerRate: 0,
       buttonSpeed: 1,
-      upgrades: UpgradeManager.initializeUpgrades()
+      upgrades: UpgradeManager.initializeUpgrades(),
+      multiButtonCount: 1
     };
     this.buttons = new Map();
     
@@ -38,27 +39,39 @@ export class Game {
 
   private init(): void {
     this.loadGame();
-    this.createInitialButton();
+    this.renderButtons();
     this.setupAutoSave();
     this.renderUpgrades();
     this.checkAutoClickerActivation();
     this.setupDeleteSaveButton();
   }
 
-  private createInitialButton(): void {
-    const buttonConfig: ButtonConfig = {
-      position: this.getRandomPosition(),
-      size: 60,
-      speed: this.state.buttonSpeed,
-      variant: ButtonVariant.Normal,
-      modifiers: [] 
-    };
-
-    this.createButton('initial', buttonConfig);
+  private renderButtons(): void {
+    // Remove all existing buttons
+    for (const id of Array.from(this.buttons.keys())) {
+      this.removeButton(id);
+    }
+    // Determine how many buttons to render
+    const count = this.state.multiButtonCount || 1;
+    for (let i = 0; i < count; i++) {
+      const buttonConfig: ButtonConfig = {
+        position: this.getRandomPosition(),
+        size: 60,
+        speed: this.state.buttonSpeed,
+        variant: ButtonVariant.Normal,
+        modifiers: []
+      };
+      this.createButton(`multi-${i}-${Date.now()}`, buttonConfig);
+    }
   }
 
   private createButton(id: string, config: ButtonConfig): void {
-    this.maybeAddModifier(config);
+    // Prevent modifiers on the initial button
+    if (id.startsWith('multi-0-')) {
+      config.modifiers = [ButtonModifier.None];
+    } else {
+      this.maybeAddModifier(config);
+    }
     const button = document.createElement('button');
     button.className = 'moving-button';
     button.textContent = this.getButtonLabel(config.variant, config.modifiers);
@@ -280,14 +293,16 @@ export class Game {
     
     // Update button speed if it changed
     if (oldState.buttonSpeed !== this.state.buttonSpeed) {
-      const button = this.buttons.get('initial');
-      if (button) {
-        button.speed = this.state.buttonSpeed;
+      for (const config of this.buttons.values()) {
+        config.speed = this.state.buttonSpeed;
       }
     }
     
     this.updateDisplay();
     this.renderUpgrades();
+    if (upgradeId === 'multi-button') {
+      this.renderButtons();
+    }
     this.saveGame();
     this.checkAutoClickerActivation();
   }
@@ -343,7 +358,10 @@ export class Game {
     const savedState = localStorage.getItem('clickDriftSave');
     if (savedState) {
       const parsed = JSON.parse(savedState);
-      this.state = { ...this.state, ...parsed };
+      // Merge in any missing upgrades from UpgradeManager
+      const defaultUpgrades = UpgradeManager.initializeUpgrades();
+      const mergedUpgrades = { ...defaultUpgrades, ...(parsed.upgrades || {}) };
+      this.state = { ...this.state, ...parsed, upgrades: mergedUpgrades };
       this.updateDisplay();
     }
   }
@@ -387,35 +405,33 @@ export class Game {
     if (this.autoClickerActive) return;
     this.autoClickerActive = true;
     this.createAutoClickerMouse();
-    const buttonId = 'initial';
-    let lastTarget = { x: 0, y: 0 };
-    const getButtonCenter = () => {
-      const button = this.container.querySelector(`button[data-id="${buttonId}"]`) as HTMLButtonElement;
-      if (!button) return null;
+    let buttonIndex = 0;
+    const getButtonIds = () => Array.from(this.buttons.keys());
+    const moveToButton = (id: string) => {
+      if (!this.autoClickerMouseEl) return;
+      const button = this.container.querySelector(`button[data-id="${id}"]`) as HTMLButtonElement;
+      if (!button) return;
       const rect = button.getBoundingClientRect();
-      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      const mouseX = rect.left + rect.width / 2 - 16;
+      const mouseY = rect.top + rect.height / 2 - 24;
+      this.autoClickerMouseEl.style.left = `${mouseX}px`;
+      this.autoClickerMouseEl.style.top = `${mouseY}px`;
+      this.autoClickerMouseEl.style.transition = 'left 0.5s cubic-bezier(0.22, 1, 0.36, 1), top 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
     };
-    const getMousePos = () => {
-      if (!this.autoClickerMouseEl) return null;
-      const rect = this.autoClickerMouseEl.getBoundingClientRect();
-      return { x: rect.left + 16, y: rect.top + 24 };
-    };
-    this.moveAutoClickerMouseToButton(buttonId);
-    this.autoClickerInterval = window.setInterval(() => {
-      // Move mouse
-      this.moveAutoClickerMouseToButton(buttonId);
-      lastTarget = getButtonCenter() || lastTarget;
-      // Wait for mouse to be close enough before clicking
+    this.autoClickerInterval = setInterval(() => {
+      const buttonIds = getButtonIds();
+      if (buttonIds.length === 0) return;
+      buttonIndex = (buttonIndex + 1) % buttonIds.length;
+      const targetId = buttonIds[buttonIndex];
+      moveToButton(targetId);
+      // Wait for mouse to reach, then click
       setTimeout(() => {
         if (!this.autoClickerActive) return;
-        const mousePos = getMousePos();
-        const dist = mousePos && lastTarget ? Math.hypot(mousePos.x - lastTarget.x, mousePos.y - lastTarget.y) : 9999;
-        if (dist < 8) { // 8px threshold
-          const button = this.container.querySelector(`button[data-id="${buttonId}"]`) as HTMLButtonElement;
-          if (button) button.click();
-        }
-      }, 500); // Wait for transition duration
-    }, 1000 / Math.max(1, this.state.autoClickerRate || 1));
+        // Defensive: check if button still exists before clicking
+        const button = this.container.querySelector(`button[data-id="${targetId}"]`) as HTMLButtonElement | null;
+        if (button) button.click();
+      }, 500);
+    }, 2000 / Math.max(1, this.state.autoClickerRate || 1));
   }
 
   private stopAutoClicker(): void {
@@ -460,11 +476,12 @@ export class Game {
       clickMultiplier: 1,
       autoClickerRate: 0,
       buttonSpeed: 1,
-      upgrades: UpgradeManager.initializeUpgrades()
+      upgrades: UpgradeManager.initializeUpgrades(),
+      multiButtonCount: 1
     };
     this.updateDisplay();
     this.renderUpgrades();
-    this.createInitialButton();
+    this.renderButtons();
     this.checkAutoClickerActivation();
     this.saveGame();
   }

@@ -9,6 +9,7 @@ export interface GameState {
   autoClickerRate: number;
   upgrades: Record<string, Upgrade>;
   buttonSpeed: number;
+  multiButtonCount?: number;
 }
 
 export interface Upgrade {
@@ -27,7 +28,8 @@ export interface Upgrade {
 export enum UpgradeType {
   ClickMultiplier = 'clickMultiplier',
   ButtonSpeed = 'buttonSpeed',
-  AutoClicker = 'autoClicker'
+  AutoClicker = 'autoClicker',
+  MultiButton = 'multiButton'
 }
 
 export interface ButtonConfig {

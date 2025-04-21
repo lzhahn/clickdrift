@@ -37,6 +37,18 @@ export class UpgradeManager {
       costMultiplier: 2.5,
       type: UpgradeType.AutoClicker,
       purchased: false
+    },
+    {
+      id: 'multi-button',
+      name: 'Multi Button',
+      description: 'Unlocks and adds another clickable button on screen',
+      cost: 50,
+      level: 0,
+      maxLevel: 5,
+      baseEffect: 1,
+      costMultiplier: 3,
+      type: UpgradeType.MultiButton,
+      purchased: false
     }
   ];
 
@@ -80,6 +92,9 @@ export class UpgradeManager {
       case UpgradeType.AutoClicker:
         newState.autoClickerRate = updatedUpgrade.level * updatedUpgrade.baseEffect;
         break;
+      case UpgradeType.MultiButton:
+        newState.multiButtonCount = (newState.multiButtonCount || 1) + 1;
+        break;
     }
 
     newState.upgrades[upgradeId] = updatedUpgrade;
@@ -98,6 +113,8 @@ export class UpgradeManager {
         return `${(currentSpeed * 100).toFixed(0)}% → ${(nextSpeed * 100).toFixed(0)}% speed`;
       case UpgradeType.AutoClicker:
         return `${upgrade.level * upgrade.baseEffect} CP/s`;
+      case UpgradeType.MultiButton:
+        return `${upgrade.level + 1} buttons on screen`;
       default:
         return '';
     }

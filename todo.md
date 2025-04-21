@@ -24,10 +24,10 @@ This is a step-by-step breakdown for building **Click Drift**, a chaotic increme
 
 ## 🌀 PHASE 2 – Button Variants + Modifiers
 
-- [ ] Create button variant system
-  - [ ] Golden Button (5x CP, rare)
-  - [ ] Frozen Button (static for bonus CP)
-- [ ] Add random spawn system for variants
+- [x] Create button variant system
+  - [x] Golden Button (5x CP, rare)
+  - [x] Frozen Button (static for bonus CP)
+- [x] Add random spawn system for variants
 - [ ] Implement button modifiers system
   - [ ] Modifiers stack with existing variants
   - [ ] Examples:
