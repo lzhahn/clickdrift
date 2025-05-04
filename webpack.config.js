@@ -18,7 +18,7 @@ module.exports = {
         test: /\.(png|jpe?g|gif|svg)$/i,
         type: 'asset/resource',
         generator: {
-          filename: '[name][ext]'
+          filename: 'assets/[name][ext]'
         }
       },
     ],
@@ -29,19 +29,26 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    publicPath: './'
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
-    // Copy images from src/public to dist
+    // Copy images from src/public to dist/assets
     {
       apply: (compiler) => {
         compiler.hooks.emit.tapAsync('CopyPublicImages', (compilation, callback) => {
           const fs = require('fs');
           const path = require('path');
           const srcDir = path.resolve(__dirname, 'src/public');
-          const distDir = path.resolve(__dirname, 'dist');
+          const distDir = path.resolve(__dirname, 'dist/assets');
+          
+          // Create assets directory if it doesn't exist
+          if (!fs.existsSync(distDir)) {
+            fs.mkdirSync(distDir, { recursive: true });
+          }
+          
           if (fs.existsSync(srcDir)) {
             fs.readdirSync(srcDir).forEach(file => {
               if (/\.(png|jpe?g|gif|svg)$/i.test(file)) {
