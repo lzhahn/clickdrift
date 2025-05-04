@@ -390,7 +390,7 @@ export class Game {
     mouse.style.background = 'none';
     mouse.innerHTML = '';
     const img = document.createElement('img');
-    img.src = '/mouse.png';
+    img.src = './mouse.png';
     img.alt = 'Auto Clicker Mouse';
     img.style.width = '100%';
     img.style.height = '100%';
